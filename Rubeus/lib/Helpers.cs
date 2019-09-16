@@ -110,9 +110,9 @@ namespace Rubeus
         {
             // converts a rc4/AES/etc. string into a byte array representation
 
-            if ((hex.Length % 32) != 0)
+            if ((hex.Length % 16) != 0)
             {
-                Console.WriteLine("\r\n[X] Hash must be 32 or 64 characters in length\r\n");
+                Console.WriteLine("\r\n[X] Hash must be 16, 32 or 64 characters in length\r\n");
                 System.Environment.Exit(1);
             }
 
@@ -121,6 +121,27 @@ namespace Rubeus
                              .Where(x => x % 2 == 0)
                              .Select(x => Convert.ToByte(hex.Substring(x, 2), 16))
                              .ToArray();
+        }
+
+        static public int SearchBytePattern(byte[] pattern, byte[] bytes)
+        {
+            List<int> positions = new List<int>();
+            int patternLength = pattern.Length;
+            int totalLength = bytes.Length;
+            byte firstMatchByte = pattern[0];
+            for (int i = 0; i < totalLength; i++)
+            {
+                if (firstMatchByte == bytes[i] && totalLength - i >= patternLength)
+                {
+                    byte[] match = new byte[patternLength];
+                    Array.Copy(bytes, i, match, 0, patternLength);
+                    if (match.SequenceEqual<byte>(pattern))
+                    {
+                        return i;
+                    }
+                }
+            }
+            return 0;
         }
     }
 }
